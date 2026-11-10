@@ -1,77 +1,73 @@
 import React, { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import API from "../services/api";
+import useAuth from "../hooks/useAuth";
 import "../styles/theme.css";
 
-
 const Login = () => {
- const [email, setEmail] = useState("");
- const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
- const handleLogin = async (e) => {
-   e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
+    try {
+      const { data } = await API.post("/auth/login", { email, password });
+      login(data);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || "Could not reach the server. Is it running?");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-   const res = await fetch("http://localhost:5001/api/auth/login", {
-     method: "POST",
-     headers: {
-       "Content-Type": "application/json",
-     },
-     body: JSON.stringify({ email, password }),
-   });
+  return (
+    <div className="auth-container">
+      <div className="auth-card">
+        <h1>🌿 OUTSY</h1>
+        <p className="tagline">Reconnect. Breathe. Grow.</p>
 
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-   const data = await res.json();
-   console.log(data);
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
+          {error && <p className="form-error">{error}</p>}
 
-   if (data.token) {
-     localStorage.setItem("token", data.token);
-     alert("Login successful 🌿");
-   } else {
-     alert(data.error);
-   }
- };
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Logging in…" : "Log In"}
+          </button>
+        </form>
 
-
- return (
-   <div className="auth-container">
-     <div className="auth-card">
-       <h1>🌿 OUTSY</h1>
-       <p className="tagline">Reconnect. Breathe. Grow.</p>
-
-
-       <form onSubmit={handleLogin}>
-         <input
-           type="email"
-           placeholder="Email"
-           value={email}
-           onChange={(e) => setEmail(e.target.value)}
-           required
-         />
-
-
-         <input
-           type="password"
-           placeholder="Password"
-           value={password}
-           onChange={(e) => setPassword(e.target.value)}
-           required
-         />
-
-
-         <button type="submit" className="auth-btn">
-           Log In
-         </button>
-       </form>
-
-
-       <p className="switch-text">
-         Don’t have an account? Register
-       </p>
-     </div>
-   </div>
- );
+        <p className="switch-text">
+          Don’t have an account? <Link to="/register">Register</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
-
 
 export default Login;

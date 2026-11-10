@@ -41,6 +41,7 @@ exports.registerUser = async (req, res) => {
 
   res.status(201).json({
     message: "Registered successfully 🎉",
+    token: generateToken(user._id),
     user: publicUser(user),
   });
 };
