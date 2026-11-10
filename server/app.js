@@ -33,6 +33,14 @@ app.use((req, res) => {
 
 // Errors thrown in any route end up here (Express 5 forwards async errors too)
 app.use((err, req, res, next) => {
+  // Bad input caught by Mongoose (schema rules, malformed ids, duplicate names)
+  if (err.name === "ValidationError" || err.name === "CastError") {
+    return res.status(400).json({ error: err.message });
+  }
+  if (err.code === 11000) {
+    return res.status(409).json({ error: "That record already exists" });
+  }
+
   console.error(err);
   res.status(err.status || 500).json({ error: err.message || "Server error" });
 });
