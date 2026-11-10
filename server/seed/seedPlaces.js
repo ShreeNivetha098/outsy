@@ -1,7 +1,8 @@
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env"), quiet: true });
+
 const mongoose = require("mongoose");
 const Place = require("../models/Place");
-
-mongoose.connect("mongodb://localhost:27017/outsy");
 
 const places = [
   {
@@ -203,12 +204,15 @@ const places = [
 
 async function seedData() {
   try {
+    await mongoose.connect(process.env.MONGO_URI);
     await Place.deleteMany();
     await Place.insertMany(places);
-    console.log("Data seeded successfully");
-    mongoose.connection.close();
+    console.log(`Seeded ${places.length} places`);
   } catch (error) {
     console.error(error);
+    process.exitCode = 1;
+  } finally {
+    await mongoose.connection.close();
   }
 }
 

@@ -12,18 +12,20 @@ Outsy builds personalised one-day outing plans in and around Coimbatore, based o
 
 ```bash
 # install dependencies
-npm install            # root (server dependencies)
-cd client && npm install
+npm --prefix server install
+npm --prefix client install
 
-# configure the server
+# configure
 cp server/.env.example server/.env   # then edit values
+cp client/.env.example client/.env
 
 # seed places into MongoDB
-node server/seed/seedPlaces.js
+npm run seed
 
-# start the API (port 5001)
-cd server && npm run dev
+# start the API (port 5001) and the client (port 3000), in two terminals
+npm run server
+npm run client
 
-# start the client (port 3000)
-cd client && npm start
+# run server tests
+npm test
 ```

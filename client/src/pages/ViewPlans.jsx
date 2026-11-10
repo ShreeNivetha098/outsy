@@ -3,7 +3,8 @@ import React from "react";
 function ViewPlans() {
   return (
     <div>
-      <h1>View Plans</h1>
+      <h1>My Plans</h1>
+      <p className="tagline">Saved plans will appear here.</p>
     </div>
   );
 }
