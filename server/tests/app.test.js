@@ -33,21 +33,21 @@ describe("auth", () => {
 
 describe("protect middleware", () => {
   it("rejects requests without a Bearer token", async () => {
-    const res = await request(app).get("/api/plans/private");
+    const res = await request(app).get("/api/plans");
     expect(res.status).toBe(401);
     expect(res.body.error).toBe("Not authorized, no token");
   });
 
   it("rejects a token without the Bearer prefix", async () => {
     const token = jwt.sign({ id: "x" }, process.env.JWT_SECRET);
-    const res = await request(app).get("/api/plans/private").set("Authorization", token);
+    const res = await request(app).get("/api/plans").set("Authorization", token);
     expect(res.status).toBe(401);
   });
 
   it("rejects a token signed with the wrong secret", async () => {
     const token = jwt.sign({ id: "x" }, "wrong-secret");
     const res = await request(app)
-      .get("/api/plans/private")
+      .get("/api/plans")
       .set("Authorization", `Bearer ${token}`);
     expect(res.status).toBe(401);
     expect(res.body.error).toBe("Not authorized, token failed");
